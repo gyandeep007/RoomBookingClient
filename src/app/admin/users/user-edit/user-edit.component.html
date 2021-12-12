@@ -19,12 +19,14 @@
 
   <div class="form-group" *ngIf="user.id == null"> <!-- only show this field on adding a user -->
     <label for="password">Password</label>
-    <input type="password" class="form-control" id="password" placeholder="password" name="password" [(ngModel)]="password">
-    <div class="alert alert-danger">error message placeholder</div>
+    <input type="password" class="form-control" id="password" placeholder="password" name="password" [(ngModel)]="password"
+           #passwordField="ngModel" required>
+    <div class="alert alert-danger"  *ngIf="passwordField.invalid && passwordField.touched">error message placeholder</div>
 
     <label for="password2">Repeat Password</label>
-    <input type="password" class="form-control" id="password2" placeholder="password" name="password2" [(ngModel)]="password2">
-    <div class="alert alert-danger">error message placeholder</div>
+    <input type="password" class="form-control" id="password2" placeholder="password" name="password2" [(ngModel)]="password2"
+          #password2Field="ngModel" required>
+    <div class="alert alert-danger" *ngIf="password2Field.invalid && password2Field.touched">error message placeholder</div>
 
   </div>
 

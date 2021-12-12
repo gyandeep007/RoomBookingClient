@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {User} from '../../model/User';
 import {DataService} from '../../data.service';
 import {ActivatedRoute, Router} from '@angular/router';
+import {FormResetService} from '../../form-reset.service';
 
 @Component({
   selector: 'app-users',
@@ -15,7 +16,8 @@ export class UsersComponent implements OnInit {
   action:string;
   constructor(private dataService:DataService,
               private route:ActivatedRoute,
-              private router:Router) {
+              private router:Router,
+              private formResetService : FormResetService) {
     console.log('constructor of User component')
   }
 
@@ -37,6 +39,10 @@ export class UsersComponent implements OnInit {
         console.log(this.route);
         if(id){
           this.selectedUser = this.users.find(user=>user.id === +id);
+        }
+        if(this.action === 'add'){
+          this.selectedUser = new User();
+         this.formResetService.resetUserEvent.emit(this.selectedUser);
         }
       }
     );

@@ -1,13 +1,17 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Layout, LayoutCapacity, Room} from '../../../model/Room';
-import {FormControl, FormGroup} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {DataService} from '../../../data.service';
+import {Router} from '@angular/router';
+import {FormResetService} from '../../../form-reset.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-room-edit',
   templateUrl: './room-edit.component.html',
   styleUrls: ['./room-edit.component.css']
 })
-export class RoomEditComponent implements OnInit {
+export class RoomEditComponent implements OnInit,OnDestroy {
 
   @Input()
   room:Room;
@@ -15,25 +19,37 @@ export class RoomEditComponent implements OnInit {
   layouts=Object.keys(Layout);
   layoutEnums=Layout;
 
-  roomForm = new FormGroup(
-    {
-      roomName : new FormControl('roomName'),
-      location : new FormControl('location')
-    }
-  );
+  roomForm : FormGroup;
+  resetEventSubscription : Subscription;
 
-  constructor() { }
+  constructor(private formBuilder : FormBuilder,
+              private dataService : DataService,
+              private router : Router,
+              private fromResetService : FormResetService) { }
+
+
 
   ngOnInit(): void {
-    this.roomForm.patchValue(
-      {
-        roomName:this.room.name,
-        location:this.room.location
+    console.log('room edit ng On it method called')
+   this.initializeForm();
+   this.resetEventSubscription =  this.fromResetService.resetRoomFormEvent.subscribe(
+      room=>{
+        this.room = room;
+        this.initializeForm();
       }
-    );
+    )
+  }
+
+  initializeForm(){
+    this.roomForm = this.formBuilder.group({
+      roomName : [this.room.name,Validators.required],
+      location : [this.room.location,[Validators.required,Validators.minLength(2)]]
+    });
 
     for (const layout of this.layouts){
-      this.roomForm.addControl(`layout${layout}`,new FormControl(`layout${layout}`));
+      const layoutCapacity = this.room.capacities.find(lc=>lc.layout===Layout[layout]);
+      const initialCapacity = layoutCapacity == null?0:layoutCapacity.capacity;
+      this.roomForm.addControl(`layout${layout}`,this.formBuilder.control(initialCapacity));
     }
   }
 
@@ -50,7 +66,23 @@ export class RoomEditComponent implements OnInit {
       this.room.capacities.push(layoutCapacity);
     }
 
-    console.log(this.room);
+   if(this.room.id == null){
+     this.dataService.addRoom(this.room).subscribe(
+       next=>{
+         this.router.navigate(['admin','rooms'],{queryParams:{id:next.id,action:'view'}})
+       }
+     );
+   }else{
+     this.dataService.updateRoom(this.room).subscribe(
+       next=>{
+         this.router.navigate(['admin','rooms'],{queryParams:{id:next.id,action:'view'}})
+       }
+       );
+   }
 
+  }
+
+  ngOnDestroy(): void {
+    this.resetEventSubscription.unsubscribe();
   }
 }
