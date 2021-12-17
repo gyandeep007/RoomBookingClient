@@ -15,54 +15,52 @@ export class CalenderComponent implements OnInit {
 
   bookings : Array<Booking>;
   selectedDate:string;
+  dataLoaded = false;
+  message = '';
 
   constructor(private dataService : DataService,
               private router : Router,
               private route : ActivatedRoute) { }
 
   ngOnInit(): void {
+   this.loadingData();
+}
 
-    this.dataService.getUser(1).subscribe(
-      next=>{
-        console.log(next);
-        console.log(typeof next);
-        console.log(next.getAuthority())
-      }
-    )
-
-
+  loadingData(){
     this.route.queryParams.subscribe(
       params => {
         this.selectedDate = params['date'];
         if(!this.selectedDate){
           this.selectedDate = formatDate(new Date(),'yyyy-MM-dd','en-US');
         }
-        this.dataService.getBookings(this.selectedDate).subscribe(
+        this.dataService.getBookingsByDate(this.selectedDate).subscribe(
           next=>{
             this.bookings = next;
+            this.dataLoaded = true;
+            console.log('data',this.bookings);
           }
         );
       }
     );
-
-
   }
 
   deleteBooking(id : number) {
-    console.log('going to delete with id ',id);
+    this.message = 'deleting please wait.....'
     this.dataService.deleteBooking(id).subscribe(
       next=>{
-        this.router.navigate(['']);
-      }
+        this.message = '';
+        this.loadingData();
+      },
+      error => this.message = 'sorry there was a problem deleting the booking'
     );
   }
 
   newBooking() {
-    this.router.navigate(['addBooking']);
+    this.router.navigate(['editBookingLoad']);
   }
 
   updateBooking(id: number) {
-    this.router.navigate(['editBooking'],{queryParams:{id:id}});
+    this.router.navigate(['editBookingLoad'],{queryParams:{id:id}});
   }
 
   dateChanged(){

@@ -4,7 +4,7 @@ export class Room{
   location:string;
   capacities =new Array<LayoutCapacity>();
 
-  static fromHttp(room : Room) : Room{
+  static  fromHttp(room : Room) : Room{
     const newRoom = new Room();
     newRoom.id = room.id;
     newRoom.name = room.name;
@@ -25,9 +25,15 @@ export class LayoutCapacity{
     static fromHttp(layoutCapacity : LayoutCapacity) : LayoutCapacity{
       const newLayoutCapacity = new LayoutCapacity();
       newLayoutCapacity.capacity = layoutCapacity.capacity;
+    //  newLayoutCapacity.layout = layoutCapacity.layout;
       newLayoutCapacity.layout = Layout[layoutCapacity.layout];
 
       return newLayoutCapacity;
+    }
+
+
+    static toHttp(layoutCapacity : LayoutCapacity){
+
     }
 }
 

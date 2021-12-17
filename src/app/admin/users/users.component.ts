@@ -14,6 +14,9 @@ export class UsersComponent implements OnInit {
   users:Array<User>;
   selectedUser:User;
   action:string;
+  dataLoaded = false;
+  loadingMessage='please wait data is loading';
+  retryCount=0;
   constructor(private dataService:DataService,
               private route:ActivatedRoute,
               private router:Router,
@@ -21,17 +24,24 @@ export class UsersComponent implements OnInit {
     console.log('constructor of User component')
   }
 
-  ngOnInit(): void {
-    console.log('ngOnInit of User component')
-
-
+  loadingData(){
     this.dataService.getUsers().subscribe(
       (next)=> {
         this.users = next;
+        this.dataLoaded = true;
+        this.processUrlParams();
+      },
+      error => {
+        this.retryCount++;
+        if(this.retryCount <=5){
+          this.loadingData();
+        }
+        this.loadingMessage = 'an error occurred please try again later';
       }
     );
+  }
 
-
+  processUrlParams(){
     this.route.queryParams.subscribe(
       (params)=>{
         const id = params['id'];
@@ -42,10 +52,17 @@ export class UsersComponent implements OnInit {
         }
         if(this.action === 'add'){
           this.selectedUser = new User();
-         this.formResetService.resetUserEvent.emit(this.selectedUser);
+          this.formResetService.resetUserEvent.emit(this.selectedUser);
         }
       }
     );
+  }
+
+  ngOnInit(): void {
+    console.log('ngOnInit of User component')
+    this.loadingData();
+
+
   }
 
   setUser(id:number){

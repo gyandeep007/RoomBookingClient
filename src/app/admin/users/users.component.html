@@ -18,10 +18,11 @@
       </tr>
       </tbody>
     </table>
+    <div *ngIf="!dataLoaded">{{loadingMessage}}</div>
   </div>
   <div class="col-6">
-    <app-user-detail *ngIf="action==='view' && selectedUser" [user]="selectedUser"></app-user-detail>
-    <app-user-edit *ngIf="(action==='edit' || action==='add') && selectedUser" [user]="selectedUser"></app-user-edit>
+    <app-user-detail *ngIf="action==='view' && selectedUser" [user]="selectedUser" (dataChangeEvent)="loadingData()"></app-user-detail>
+    <app-user-edit *ngIf="(action==='edit' || action==='add') && selectedUser" [user]="selectedUser" (dataChangedEvent)="loadingData()"></app-user-edit>
   </div>
 </div>
 
