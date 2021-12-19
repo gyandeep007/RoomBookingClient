@@ -119,7 +119,9 @@ export class DataService {
 
     return of(null);
   }
-
+  validateUser(name : string,password : string) : Observable<string>{
+   return of("ok");
+  }
   constructor() {
     console.log('local data service');
     console.log(environment.restUrl);

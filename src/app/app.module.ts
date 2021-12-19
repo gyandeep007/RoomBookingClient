@@ -16,15 +16,18 @@ import { RoomEditComponent } from './admin/rooms/room-edit/room-edit.component';
 import {EditBookingComponent} from './calender/edit-booking/edit-booking.component';
 import {HttpClientModule} from '@angular/common/http';
 import { EditBookingLoadComponent } from './calender/edit-booking-load/edit-booking-load.component';
+import { LoginComponent } from './login/login.component';
+import {AuthRouteGuardService} from './auth-route-guard.service';
 
 const routes: Routes = [
-  {path : 'admin/users', component : UsersComponent},
-  {path : 'admin/rooms', component : RoomsComponent},
-  {path : ''           , component : CalenderComponent},
-  {path : 'editBookingLoad', component : EditBookingLoadComponent},
-  {path : 'editBooking', component : EditBookingComponent},
-  {path : 'addBooking',  component : EditBookingComponent},
-  {path : '404'           , component : PageNotFoundComponent},
+  {path : 'admin/users',      component : UsersComponent, canActivate : [AuthRouteGuardService]},
+  {path : 'admin/rooms',      component : RoomsComponent, canActivate : [AuthRouteGuardService]},
+  {path : ''           ,      component : CalenderComponent},
+  {path : 'editBookingLoad',  component : EditBookingLoadComponent, canActivate : [AuthRouteGuardService]},
+  {path : 'editBooking',      component : EditBookingComponent, canActivate : [AuthRouteGuardService]},
+  {path : 'addBooking',       component : EditBookingComponent, canActivate : [AuthRouteGuardService]},
+  {path : 'login',            component : LoginComponent},
+  {path : '404',              component : PageNotFoundComponent},
   {path : '**', redirectTo : '/404'}
 ];
 
@@ -43,7 +46,8 @@ const routes: Routes = [
     UserEditComponent,
     RoomEditComponent,
     EditBookingComponent,
-    EditBookingLoadComponent
+    EditBookingLoadComponent,
+    LoginComponent
   ],
   imports: [
     BrowserModule,

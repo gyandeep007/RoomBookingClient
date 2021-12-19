@@ -5,7 +5,7 @@ import {Observable, of} from 'rxjs';
 import {Booking} from './model/Booking';
 import {formatDate} from '@angular/common';
 import {environment} from '../environments/environment';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {map} from 'rxjs/operators';
 import {root} from 'rxjs/internal-compatibility';
 
@@ -125,20 +125,40 @@ export class DataService {
   }
 
   addBooking(newBooking : Booking) : Observable<Booking>{
-    return of(null);
+    return this.http.post<Booking>(environment.restUrl+'/api/bookings',this.getCorrectedBooking(newBooking));
   }
 
   updateBooking(booking : Booking) : Observable<Booking>{
-    return of(null);
+    return this.http.put<Booking>(environment.restUrl+'/api/bookings',this.getCorrectedBooking(booking));
   }
 
   deleteBooking(id : number) : Observable<any>{
     return   this.http.delete<Array<Booking>>(environment.restUrl+'/api/bookings/'+id);
   }
 
+  validateUser(name : string,password : string) : Observable<string>{
+    const  authData = btoa(`${name}:${password}`);
+    const headers = new HttpHeaders().append('Authorization','Basic '+authData);
+   return this.http.get<string>(environment.restUrl+'/api/basicAuth/validate',{headers:headers});
+  }
+
   constructor(private http: HttpClient) {
 
     console.log(environment.restUrl);
+  }
+
+  getCorrectedBooking(booking : Booking){
+
+    let correctLayout ;
+    for(const member in Layout){
+      if(Layout[member] === booking.layout){
+        correctLayout = member;
+      }
+    }
+    const correctBooking = {id:booking.id,room:this.getCorrectedRoom(booking.room),user:booking.user,layout:correctLayout,title:booking.title,
+      date:booking.date,startTime:booking.startTime,endTime:booking.endTime,participants:booking.participants}
+    console.log('booking ',correctBooking);
+    return correctBooking;
   }
 
   getUser(id:number):Observable<User>{
@@ -149,4 +169,6 @@ export class DataService {
        })
      );
   }
+
+
 }
