@@ -5,6 +5,7 @@ import {DataService} from '../../../data.service';
 import {Router} from '@angular/router';
 import {FormResetService} from '../../../form-reset.service';
 import {Subscription} from 'rxjs';
+import {AuthService} from '../../../auth.service';
 
 @Component({
   selector: 'app-room-edit',
@@ -28,12 +29,12 @@ export class RoomEditComponent implements OnInit,OnDestroy {
   constructor(private formBuilder : FormBuilder,
               private dataService : DataService,
               private router : Router,
-              private fromResetService : FormResetService) { }
+              private fromResetService : FormResetService,
+              private authService : AuthService) { }
 
 
 
   ngOnInit(): void {
-    console.log('room edit ng On it method called')
    this.initializeForm();
    this.resetEventSubscription =  this.fromResetService.resetRoomFormEvent.subscribe(
       room=>{
@@ -63,7 +64,7 @@ export class RoomEditComponent implements OnInit,OnDestroy {
     this.room.capacities = new Array<LayoutCapacity>();
     for (const layout of this.layouts){
      const layoutCapacity = new LayoutCapacity();
-     layoutCapacity.layout=Layout[layout];
+    layoutCapacity.layout=Layout[layout];
      layoutCapacity.capacity= this.roomForm.controls[`layout${layout}`].value;
     //  this.roomForm.addControl(`layout${layout}`,new FormControl(`layout${layout}`));
       this.room.capacities.push(layoutCapacity);
@@ -78,7 +79,8 @@ export class RoomEditComponent implements OnInit,OnDestroy {
        error => this.message = 'Something went wrong. You may wish to try again.'
      );
    }else{
-     this.dataService.updateRoom(this.room).subscribe(
+      console.log('editing room',this.room);
+     this.dataService.updateRoom(this.room,this.authService.jwtToken).subscribe(
        next=>{
          this.dataChangeEvent.emit();
          this.router.navigate(['admin','rooms'],{queryParams:{id:next.id,action:'view'}})

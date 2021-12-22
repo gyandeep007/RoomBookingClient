@@ -18,6 +18,7 @@ import {HttpClientModule} from '@angular/common/http';
 import { EditBookingLoadComponent } from './calender/edit-booking-load/edit-booking-load.component';
 import { LoginComponent } from './login/login.component';
 import {AuthRouteGuardService} from './auth-route-guard.service';
+import { LogoutComponent } from './logout/logout.component';
 
 const routes: Routes = [
   {path : 'admin/users',      component : UsersComponent, canActivate : [AuthRouteGuardService]},
@@ -47,7 +48,8 @@ const routes: Routes = [
     RoomEditComponent,
     EditBookingComponent,
     EditBookingLoadComponent,
-    LoginComponent
+    LoginComponent,
+    LogoutComponent
   ],
   imports: [
     BrowserModule,

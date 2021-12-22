@@ -18,12 +18,14 @@ export class Room{
 }
 
 export class LayoutCapacity{
+    id:number;
     layout:Layout;
     capacity:number;
 
 
     static fromHttp(layoutCapacity : LayoutCapacity) : LayoutCapacity{
       const newLayoutCapacity = new LayoutCapacity();
+      newLayoutCapacity.id = layoutCapacity.id;
       newLayoutCapacity.capacity = layoutCapacity.capacity;
     //  newLayoutCapacity.layout = layoutCapacity.layout;
       newLayoutCapacity.layout = Layout[layoutCapacity.layout];

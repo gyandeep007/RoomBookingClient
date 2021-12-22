@@ -15,15 +15,16 @@ import {root} from 'rxjs/internal-compatibility';
 export class DataService {
 
 
-  getRooms() : Observable<Array<Room>>{
-
-    return this.http.get<Array<Room>>(environment.restUrl+'/api/rooms')
+  getRooms(token : string) : Observable<Array<Room>>{
+   const headers = new HttpHeaders().append('Authorization','Bearer '+token);
+    return this.http.get<Array<Room>>(environment.restUrl+'/api/rooms',{headers:headers})
       .pipe(
         map(data=>{
           const rooms = new Array<Room>();
           for(const room of data){
             rooms.push(Room.fromHttp(room));
           }
+          console.log('rooms returned ',rooms);
           return rooms;
         })
       );
@@ -52,6 +53,7 @@ export class DataService {
 
   }
   private getCorrectedRoom(room : Room){
+    console.log('before conversion ',room);
     const correctedRoom = {id:room.id,name:room.name,location:room.location,capacities:[]};
 
     for(const lc of room.capacities){
@@ -61,14 +63,15 @@ export class DataService {
           correctLayout = member;
         }
       }
-      const correctedLayout = {capacity:lc.capacity,layout:correctLayout};
+      const correctedLayout = {id:lc.id,capacity:lc.capacity,layout:correctLayout};
       correctedRoom.capacities.push(correctedLayout);
     }
+    console.log('updated room ',correctedRoom);
     return correctedRoom;
   }
-  updateRoom(room : Room) : Observable<Room>{
-
-    return this.http.put<Room>(environment.restUrl+'/api/rooms',this.getCorrectedRoom(room));
+  updateRoom(room : Room,token : string) : Observable<Room>{
+    const headers = new HttpHeaders().append('Authorization','Bearer '+token);
+    return this.http.put<Room>(environment.restUrl+'/api/rooms',this.getCorrectedRoom(room),{headers:headers});
   }
 
   addRoom(newRoom : Room) : Observable<Room>{
@@ -136,10 +139,10 @@ export class DataService {
     return   this.http.delete<Array<Booking>>(environment.restUrl+'/api/bookings/'+id);
   }
 
-  validateUser(name : string,password : string) : Observable<string>{
+   validateUser(name : string,password : string) : Observable<{result:string}>{
     const  authData = btoa(`${name}:${password}`);
     const headers = new HttpHeaders().append('Authorization','Basic '+authData);
-   return this.http.get<string>(environment.restUrl+'/api/basicAuth/validate',{headers:headers});
+   return this.http.get<{result: string}>(environment.restUrl+'/api/basicAuth/validate',{headers:headers});
   }
 
   constructor(private http: HttpClient) {

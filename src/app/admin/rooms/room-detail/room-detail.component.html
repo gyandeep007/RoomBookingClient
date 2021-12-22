@@ -1,7 +1,7 @@
 <div class="roomDetails">
   <h2>Room details</h2>
-  <a class="btn btn-small btn-warning" (click)="editRoom()">edit</a>
-  <a class="btn btn-small btn-warning" (click)="deleteRoom()">delete</a>
+  <a class="btn btn-small btn-warning" (click)="editRoom()" *ngIf="isAdminUser">edit</a>
+  <a class="btn btn-small btn-warning" (click)="deleteRoom()" *ngIf="isAdminUser"m>delete</a>
   <div class="bg-warning p-5" *ngIf="message">{{message}}</div>
   <table>
     <tr>
@@ -18,7 +18,7 @@
   <h4>This room can accomodate:</h4>
   <table *ngIf="room.capacities">
     <tr *ngFor="let capacity of room.capacities"> <!-- repeat the tr for each capacity -->
-      <td>{{capacity.layout}}</td><td>{{capacity.capacity}}</td>
+       <td>{{capacity.layout}}</td><td>{{capacity.capacity}}</td>
     </tr>
   </table>
 </div>
